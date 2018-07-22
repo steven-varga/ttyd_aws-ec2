@@ -48,9 +48,11 @@ class ttyd_enqueue :
                 msg = json.loads( frame )
                 # create user: 'h5cpp_####' where #### = port_number 
                 username,userid = self.add_user( port )
+                env = {'HOME':'/home/' + username, 'SHELL':'/bin/bash', 'TERM':'xterm-256color', 'USER':username,
+                'PATH':'/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin'}
                 res = subprocess.check_output(
                         ['ttyd','-u', userid, '-g', gid, '-o', '-p ' + str(port), '/bin/bash'],
-                        env={"HOME":"/home/" + username}, # the environment has to be replaced
+                        env=env, # the environment has to be replaced
                         cwd="/home/" + username,          # set home directory
                         stderr=subprocess.STDOUT )        # output redirected
             except OSError as err:

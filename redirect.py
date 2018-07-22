@@ -31,14 +31,13 @@ url =  'http://' + ttyd.link( ('54.209.33.120',5000), 10 )
 print "Status: 302 Moved"
 print "Location: %s" % url
 print
-print # HTTP says you have to have a blank line between headers and content
 print '<html>'
 print '  <head>'
 print '    <meta http-equiv="refresh" content="0;url=%s" />' % url
-print '    <title>You are going to be redirected</title>'
+print '    <title>You are going to be redirected to web based terminal</title>'
 print '  </head>' 
 print '  <body>'
-print '    Redirecting... <a href="%s">Click here if you are not redirected</a>' % url
+print '    Redirecting... <a href="%s">free h5cpp trial manual link</a>' % url
 print '  </body>'
 print '</html>'
 
