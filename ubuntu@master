@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import os,sys,subprocess,signal,socket,pwd,grp
-import json,random,time,argparse,logging
+import zmq,json
+import random,time,argparse
 
 class ttyd_enqueue :
     keep_going = True
@@ -39,12 +40,9 @@ class ttyd_enqueue :
     def connect(self, port_min, port_max ) :
         s = self.socket
         gid = str( self.get_gid('h5cpp'))
-        username = userid = port = None
-        get_newport = True
+        username = userid = None
         while self.keep_going :
-            if get_newport :
-                port = random.randint(port_min,port_max)
-                get_newport = False
+            port = random.randint(port_min,port_max)
             s.sendto(json.dumps( { 'cmd':'heartbeat', 'port': port }  ), self.server )
             try:
                 frame, address = s.recvfrom(1024)
@@ -59,15 +57,13 @@ class ttyd_enqueue :
                         cwd="/home/" + username,          # set home directory
                         stderr=subprocess.STDOUT )        # output redirected
             except OSError as err:
-                logging.info('OSError %s',str(err) )
+                print 'OSError: ', err
                 self.keep_going = False
             except IOError as err:
-                pass #logging.info('expired session %s',str(err) )
+                print 'IOError: ', err
             finally : # cleanup shines or rains
                 if username is not None:
-                    get_newport = True
                     self.del_user(username)
-                    username = None
 
     def shutdown( self ) :
         self.socket.close()
@@ -77,12 +73,10 @@ if __name__ == '__main__' :
 
     parser.add_argument('-p','--port',   default=5000,  help='udp port to connect')
     parser.add_argument('-s','--server', default='54.209.33.120',  help='server to connect')
-    parser.add_argument('-t','--timeout', default=5.0,  help='socket timeout')
+    parser.add_argument('-t','--timeout', default=2.0,  help='socket timeout')
     parser.add_argument('--port-min', default=2000,  help='min random port ttyd listens at')
     parser.add_argument('--port-max', default=9999,  help='max random port ttyd listens at')
 
-    logging.basicConfig( 
-        format='%(asctime)s %(message)s', filename='/tmp/ttyd_master.log',level=logging.INFO)
     args = parser.parse_args()
     cmd  = vars(args)
     ttyd = ttyd_enqueue(cmd['server'], cmd['port'], cmd['timeout'] )

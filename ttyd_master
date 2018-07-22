@@ -3,6 +3,7 @@ import os,sys,subprocess,signal,socket,pwd,grp
 import json,random,time,argparse
 import boto3
 import botocore.session
+import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime,timedelta
@@ -60,16 +61,18 @@ class ttyd_queue :
                 msg = json.loads( frame )
                 if msg['cmd'] == 'heartbeat':
                     dct[address] = address[0] + ':' + str(msg['port'])
+                    #logging.info('heartbeat %s', str(msg['port']))
                 elif msg['cmd'] == 'gethref':
                     try :
                         ttyd_address,value = dct.popitem()
                         s.sendto(json.dumps( { 'cmd':'newuser' } ), ttyd_address )
                         s.sendto(json.dumps( { 'seq':msg['seq'],'href':value } ), address )
-                    except KeyError:
+                    except KeyError as err:
+                        #logging.info('KeyError %s',str(err) )
                         # ran out of aws-ec2 cores: instatiate more:
                         s.sendto(json.dumps( { 'seq':msg['seq'],'href':self.link } ), address )
             except IOError as err:
-                print err
+                logging.info('IOError %s',str(err) )
                 self.keep_going = False
 
     def shutdown( self ) :
@@ -91,6 +94,8 @@ if __name__ == '__main__' :
     parser.add_argument('-l','--link', default='h5cpp.ca/service_not_available.html',  
             help='link to redirect if all ttyd services are busy')
 
+    logging.basicConfig( 
+        format='%(asctime)s %(message)s', filename='/tmp/ttyd_master.log',level=logging.INFO)
     cmd  = vars(parser.parse_args( ))
     ttyd = ttyd_queue(cmd['port'], cmd['timeout'], cmd['link']  )
 

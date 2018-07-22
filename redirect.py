@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
-import cgi, socket, json
+import cgi, socket, json, os
+import logging
+
 
 class ttyd_redirector :
     keep_going = True
@@ -27,6 +29,11 @@ class ttyd_redirector :
 
 ttyd = ttyd_redirector( 2.0 )
 url =  'http://' + ttyd.link( ('54.209.33.120',5000), 10 )
+
+logging.basicConfig( 
+    format='%(asctime)s %(message)s', filename='/tmp/h5cpp.log',level=logging.INFO)
+env = os.environ
+logging.info('%s\t%s\t%s',url,env['REMOTE_ADDR'], env['HTTP_USER_AGENT'] )
 
 print "Status: 302 Moved"
 print "Location: %s" % url
