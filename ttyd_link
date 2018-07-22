@@ -1,0 +1,40 @@
+#!/usr/bin/env python2
+import os,sys,subprocess,signal,socket,pwd,grp
+import json,random,time,argparse
+
+
+class ttyd_gethref :
+    keep_going = True
+    server = socket = None
+
+    def __init__( self, server, port, timeout, retry ) :
+        socket_ = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socket_.settimeout( timeout )
+        self.connect( socket_, (server,port), retry)
+
+    def connect( self, qsocket, server, retry ) :
+        msg = None
+        for seq in range(1,retry):
+            qsocket.sendto(json.dumps( { 'cmd':'gethref','seq':seq }  ), server )
+            try :
+                frame, address = qsocket.recvfrom(1024)
+                msg = json.loads( frame )
+                if msg['seq'] == seq :
+                    break
+            except:
+                seq += 1
+                print 'retrying: ', seq
+
+        # we have our reply
+        print msg
+
+if __name__ == '__main__' :
+    parser = argparse.ArgumentParser(description='retrieves an href link from ttyd_queue')
+
+    parser.add_argument('-t','--timeout', default=2.0,  help='packet timeout')
+    parser.add_argument('-r','--retry', default=10,  help='max retry after transmission failure')
+    parser.add_argument('-p','--port',   default=5000,  help='udp port listen at')
+    parser.add_argument('-s','--server', default='54.209.33.120',  help='ttyd_master ip address')
+
+    cmd = vars(parser.parse_args())
+    ttyd_gethref( cmd['server'], cmd['port'], cmd['timeout'], cmd['retry']   )
