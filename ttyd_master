@@ -1,13 +1,16 @@
 #!/usr/bin/env python2
 import os,sys,subprocess,signal,socket,pwd,grp
 import json,random,time,argparse
-import boto3
-import botocore.session
+#import boto3, botocore.session
 import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime,timedelta
-from botocore.exceptions import ClientError
+#from botocore.exceptions import ClientError
+
+SERVICE_NOT_AVIALABLE_PAGE = 'http://h5cpp.ca/md__home_steven_Documents_projects_h5cpp_docs_pages_not_available.html'
+
+
 
 def aws_spot_request( session, image_id, security_group_id=['sg-c66bcc8d'], key_pair='analytics', tag='h5cpp', instance_type='c3.large', bid_price='0.13',
         zone='us-east-1a', count=1, group='ttyd', exp =  datetime.now() + timedelta(minutes=5), 
@@ -49,7 +52,7 @@ class ttyd_queue :
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.bind(('', port))
         self.socket = s
-        self.ec2 = boto3.client('ec2')
+        #self.ec2 = boto3.client('ec2')
         self.link = link
 
     def listen( self ) :
@@ -91,12 +94,14 @@ if __name__ == '__main__' :
 
     parser.add_argument('-t','--timeout', default=2.0,  help='socket timeout')
     parser.add_argument('-p','--port', default=5000,  help='udp port listen at')
-    parser.add_argument('-l','--link', default='h5cpp.ca/service_not_available.html',  
+    parser.add_argument('-l','--link', default=SERVICE_NOT_AVIALABLE_PAGE,
             help='link to redirect if all ttyd services are busy')
+    parser.add_argument('--logfile', default='./user_tracking.log',
+            help='connection logs are recorded for user-tracking')
 
-    logging.basicConfig( 
-        format='%(asctime)s %(message)s', filename='/tmp/ttyd_master.log',level=logging.INFO)
     cmd  = vars(parser.parse_args( ))
+    logging.basicConfig(
+        format='%(asctime)s %(message)s', filename=cmd['logfile'],level=logging.INFO)
     ttyd = ttyd_queue(cmd['port'], cmd['timeout'], cmd['link']  )
 
     #scheduler = BackgroundScheduler()

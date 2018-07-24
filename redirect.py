@@ -2,6 +2,8 @@
 import cgi, socket, json, os
 import logging
 
+UDP_SERVER_IP = '52.2.17.127'
+UDP_SERVER_PORT = 5000
 
 class ttyd_redirector :
     keep_going = True
@@ -28,7 +30,7 @@ class ttyd_redirector :
         return msg['href']
 
 ttyd = ttyd_redirector( 2.0 )
-url =  'http://' + ttyd.link( ('54.209.33.120',5000), 10 )
+url =  'http://' + ttyd.link( (UDP_SERVER_IP,UDP_SERVER_PORT), 10 )
 
 logging.basicConfig( 
     format='%(asctime)s %(message)s', filename='/tmp/h5cpp.log',level=logging.INFO)

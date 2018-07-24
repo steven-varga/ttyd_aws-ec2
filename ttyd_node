@@ -76,7 +76,7 @@ if __name__ == '__main__' :
     parser = argparse.ArgumentParser(description='this client connects to server, the client must have h5cpp group defined')
 
     parser.add_argument('-p','--port',   default=5000,  help='udp port to connect')
-    parser.add_argument('-s','--server', default='54.209.33.120',  help='server to connect')
+    parser.add_argument('-s','--server', default='52.2.17.127',  help='server to connect')
     parser.add_argument('-t','--timeout', default=5.0,  help='socket timeout')
     parser.add_argument('--port-min', default=2000,  help='min random port ttyd listens at')
     parser.add_argument('--port-max', default=9999,  help='max random port ttyd listens at')
