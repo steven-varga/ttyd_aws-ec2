@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime,timedelta
 #from botocore.exceptions import ClientError
 
-SERVICE_NOT_AVIALABLE_PAGE = 'http://h5cpp.ca/md__home_steven_Documents_projects_h5cpp_docs_pages_not_available.html'
+SERVICE_NOT_AVIALABLE_PAGE = 'h5cpp.ca/md__home_steven_Documents_projects_h5cpp_docs_pages_not_available.html'
 
 
 class ttyd_queue :
