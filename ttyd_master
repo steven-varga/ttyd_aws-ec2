@@ -11,42 +11,12 @@ from datetime import datetime,timedelta
 SERVICE_NOT_AVIALABLE_PAGE = 'http://h5cpp.ca/md__home_steven_Documents_projects_h5cpp_docs_pages_not_available.html'
 
 
-
-def aws_spot_request( session, image_id, security_group_id=['sg-c66bcc8d'], key_pair='analytics', tag='h5cpp', instance_type='c3.large', bid_price='0.13',
-        zone='us-east-1a', count=1, group='ttyd', exp =  datetime.now() + timedelta(minutes=5), 
-         token='ttyd', dryrun=False ):
-
-    spot_req =  session.request_spot_instances(
-        DryRun=dryrun, AvailabilityZoneGroup=zone, InstanceCount=count,
-        LaunchSpecification={
-            'EbsOptimized': False,
-            'KeyName': key_pair,
-            'ImageId': image_id,
-            'InstanceType': instance_type,
-            'Placement': {
-                'AvailabilityZone': 'us-east-1a',
-            },
-            'SecurityGroupIds': security_group_id,
-        }, SpotPrice=bid_price, Type='one-time', InstanceInterruptionBehavior='terminate')
-    #session.create_tags(spot_req.id, [{'Key'='cluster','Value'=tag}, ] )
-
-    state = 'open'
-    while state == 'open':
-        time.sleep(2.0)
-        spot = session.get_all_spot_instance_requests(spot_req.id)[0]
-        state = spot.state
-        print('Spot request ' + spot.id + ' status: ' + spot.status.code + ': ' + spot.status.message)
-
-    print 'aws ec2 state: ', state
-
-
 class ttyd_queue :
     keep_going = True
     socket = scheduler = job_aws = ec2 = link = None
 
     def aws_callback( self ):
         print 'hello...'
-
 
     def __init__( self, port, timeout, link  ) :
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
